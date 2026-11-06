@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Activity, ArrowLeft, ArrowUpLeft, Bell, BriefcaseBusiness, Check, CheckCheck, ChevronDown,
-  CircleHelp, ClipboardList, Clock3, Code2, FolderKanban, Layers3, LayoutDashboard,
+  CircleHelp, ClipboardList, Clock3, FolderKanban, Layers3, LayoutDashboard,
   Menu, MessageCircle, MessageSquareText, MoreHorizontal, Plus, Search, Send, Settings2,
-  ShieldCheck, Sparkles, Users, Video, WandSparkles, X
+  ShieldCheck, Sparkles, Users, Video, X
 } from 'lucide-react'
 import { agents, agentForText, createId, exampleTasks, relativeTime } from './data'
 import OfficeFloor from './OfficeFloor'
