@@ -1,8 +1,13 @@
+# Dependencies
 node_modules/
+
+# Builds
 dist/
+
+# Environment and local settings
 .env
 .env.*
 !.env.example
-.DS_Store
 .vercel/
+.DS_Store
 *.log
