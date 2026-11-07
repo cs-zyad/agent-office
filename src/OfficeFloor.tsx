@@ -6,6 +6,7 @@ import './office-floor.css'
 type Props = {
   agents: Agent[]
   tasks: Task[]
+  liveAgents?: Record<string, {state: 'working' | 'done' | 'error' | 'idle'; activity: string; updatedAt: number}>
   onAgentClick: (id: AgentId) => void
   onManagerClick: () => void
   onMeetingClick: () => void
@@ -25,7 +26,7 @@ const roomProps: Record<AgentId, { equipment: string; extra: string; number: str
   review: { equipment: '🔎', extra: '✓', number: '07' },
   social: { equipment: '📸', extra: '♥', number: '08' }
 }
-export default function OfficeFloor({ agents, tasks, onAgentClick, onManagerClick, onMeetingClick }: Props) {
+export default function OfficeFloor({ agents, tasks, liveAgents = {}, onAgentClick, onManagerClick, onMeetingClick }: Props) {
   return <section className="floor-section" aria-label="مخطط المقر الافتراضي">
     <div className="floor-heading">
       <div>
@@ -53,7 +54,9 @@ export default function OfficeFloor({ agents, tasks, onAgentClick, onManagerClic
           if (!agent) return null
           const activeTasks = tasks.filter(t => t.agentId === id && t.state === 'doing')
           const equipment = roomProps[id]
-          return <button type="button" key={id} className={'floor-room floor-room-' + id} onClick={() => onAgentClick(id)} style={{ '--floor-accent': agent.color } as React.CSSProperties} aria-label={'دخول غرفة ' + agent.name}>
+          const observed = liveAgents[id]
+          const observedWorking = observed?.state === 'working' && Date.now() - observed.updatedAt < 180_000
+          return <button type="button" key={id} className={'floor-room floor-room-' + id + (observedWorking ? ' floor-room-is-live' : '')} onClick={() => onAgentClick(id)} style={{ '--floor-accent': agent.color } as React.CSSProperties} aria-label={'دخول غرفة ' + agent.name}>
             <span className="floor-room-heading"><strong>{agent.name}</strong><span className="floor-room-number">{equipment.number}</span></span>
             <span className="floor-room-inside">
               <span className="floor-room-rug"/>
@@ -64,7 +67,7 @@ export default function OfficeFloor({ agents, tasks, onAgentClick, onManagerClic
               <span className="floor-agent"><span className="floor-agent-face">{agent.emoji}</span><span className="floor-agent-body"/><span className="floor-agent-shadow"/></span>
               <span className="floor-room-door"/>
             </span>
-            <span className="floor-room-bottom"><span className="floor-room-online"><i/>{activeTasks.length ? 'مهمة قيد المتابعة' : 'متاح للمحادثة'}</span><ArrowUpLeft size={15}/></span>
+            <span className="floor-room-bottom"><span className="floor-room-online"><i/>{observedWorking ? observed.activity : activeTasks.length ? 'مهمة تجريبية' : 'متاح للمحادثة'}</span><ArrowUpLeft size={15}/></span>
           </button>
         })}
       </div>

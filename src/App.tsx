@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { agents, agentForText, createId, exampleTasks, relativeTime } from './data'
 import OfficeFloor from './OfficeFloor'
+import CodexObserver, { type LiveAgent } from './CodexObserver'
 import type { Agent, AgentId, Message, Task, TaskState } from './data'
 
 type View = 'office' | 'tasks' | 'meeting'
@@ -55,6 +56,7 @@ export default function App() {
   const [agentTab, setAgentTab] = useState<'chat' | 'tasks'>('chat')
   const [search, setSearch] = useState('')
   const [showHelp, setShowHelp] = useState(false)
+  const [liveAgents, setLiveAgents] = useState<Record<string, LiveAgent>>({})
   const scrollRef = useRef<HTMLDivElement>(null)
   const project = projects.find(p => p.id === projectId) || projects[0]
   const visibleTasks = tasks.filter(t => (t as Task & { projectId?: string }).projectId === projectId || (projectId === 'demo' && !(t as Task & { projectId?: string }).projectId))
@@ -138,7 +140,8 @@ export default function App() {
       <div className="page-content">
         {view === 'office' && <>
           <section className="welcome-head"><div><div className="eyebrow"><span className="eyebrow-line"/> غرفة التحكم الذكية</div><h1>صباح الإبداع <span className="wave">✳</span></h1><p>كل فريقك في مكان واحد. وزّع المهام، راقب التقدم، وخلّ الأفكار تتحول إلى إنجاز.</p></div><Badge variant="violet"><Sparkles size={13}/> تجربة تفاعلية</Badge></section>
-          <OfficeFloor agents={agents} tasks={visibleTasks} onAgentClick={openAgent} onManagerClick={openManager} onMeetingClick={() => navigate('meeting')}/>
+          <CodexObserver onUpdate={setLiveAgents}/>
+          <OfficeFloor agents={agents} tasks={visibleTasks} liveAgents={liveAgents} onAgentClick={openAgent} onManagerClick={openManager} onMeetingClick={() => navigate('meeting')}/>
           <section className="stats-row"><div className="stat"><span className="stat-icon aqua"><Users size={18}/></span><div><strong>{agents.length}</strong><small>أقسام متخصصة</small></div></div><div className="stat"><span className="stat-icon amber"><Activity size={19}/></span><div><strong>{active}</strong><small>مهام قيد التنفيذ</small></div></div><div className="stat"><span className="stat-icon green"><CheckCheck size={19}/></span><div><strong>{completed}</strong><small>مهام مكتملة</small></div></div><div className="stat"><span className="stat-icon purple"><ClipboardList size={19}/></span><div><strong>{pending}</strong><small>مهام بالانتظار</small></div></div></section>
           <section className="team-section"><div className="section-header"><div><div className="eyebrow tiny">استكشف مقرّك</div><h2>مكاتب الفريق <span>✦</span></h2><p>كل مكتب له تخصصه وطابعه الخاص. اضغط للدخول إليه.</p></div><label className="search-box"><Search size={16}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث عن قسم..." aria-label="ابحث عن قسم"/></label></div>
             <div className="agents-grid">{filteredAgents.map((agent, index) => {
